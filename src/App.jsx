@@ -7,10 +7,21 @@ import { db } from "./data/db";
 function App() {
 
   const [data, setData] = useState([])
+  const [cart, setCart] = useState([])
 
   useEffect(() => {
     setData(db)
   }, [])
+
+  const addToCart = (item) => {
+    
+    const itemExists = cart.some((guitar) => guitar.id === item.id)
+    if(itemExists){
+      setCart(cart.map((guitar) => guitar.id === item.id ? {...item, quantity: guitar.quantity + 1} : guitar))
+      } else {
+        setCart([...cart, {...item, quantity: 1}])
+      }
+  }
 
   return (
     <>
@@ -23,7 +34,12 @@ function App() {
         <div className="row mt-5">
           {
             data.map((guitar) => (
-              <Guitar key={guitar.id} {...guitar} />
+              <Guitar 
+                key={guitar.id} 
+                guitar={guitar} 
+                setCart={setCart}
+                addToCart={addToCart}
+              />
             ))
           }
         </div>
