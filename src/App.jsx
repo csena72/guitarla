@@ -6,16 +6,26 @@ import { db } from "./data/db";
 
 function App() {
 
+  const inicialCart = localStorage.getItem('cart') ? JSON.parse(localStorage.getItem('cart')) : []
+
   const [data, setData] = useState([])
-  const [cart, setCart] = useState([])
+  const [cart, setCart] = useState(inicialCart)
+
+  const MIN_ITEMS = 1
+  const MAX_ITEMS = 5
 
   useEffect(() => {
     setData(db)
   }, [])
 
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart))
+  }, [cart])
+
   const addToCart = (item) => {
-    const itemExists = cart.some((guitar) => guitar.id === item.id)
-    if(itemExists){
+    const itemExists = cart.findIndex((guitar) => guitar.id === item.id)
+    if(itemExists >= 0) {
+      if(cart[itemExists].quantity >= MAX_ITEMS) return
       setCart(cart.map((guitar) => guitar.id === item.id ? {...item, quantity: guitar.quantity + 1} : guitar))
       } else {
         setCart([...cart, {...item, quantity: 1}])
@@ -28,13 +38,17 @@ function App() {
   }
 
   const incrementQuantity = (id) => {
-    const newCart = cart.map((guitar) => guitar.id === id ? {...guitar, quantity: guitar.quantity + 1} : guitar)
+    const newCart = cart.map((guitar) => guitar.id === id && guitar.quantity  < MAX_ITEMS ? {...guitar, quantity: guitar.quantity + 1} : guitar)
     setCart(newCart)
   }
 
   const decrementQuantity = (id) => {
-    const newCart = cart.map((guitar) => guitar.id === id ? {...guitar, quantity: guitar.quantity - 1} : guitar)
+    const newCart = cart.map((guitar) => guitar.id === id && guitar.quantity  > MIN_ITEMS ? {...guitar, quantity: guitar.quantity - 1} : guitar)
     setCart(newCart)
+  }
+
+  const cleanCart = () => {
+    setCart([])
   }
 
   return (
@@ -44,6 +58,7 @@ function App() {
         removeFromCart={removeFromCart}
         incrementQuantity={incrementQuantity}
         decrementQuantity={decrementQuantity}
+        cleanCart={cleanCart}
       />
 
 
