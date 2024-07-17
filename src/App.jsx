@@ -14,7 +14,6 @@ function App() {
   }, [])
 
   const addToCart = (item) => {
-    
     const itemExists = cart.some((guitar) => guitar.id === item.id)
     if(itemExists){
       setCart(cart.map((guitar) => guitar.id === item.id ? {...item, quantity: guitar.quantity + 1} : guitar))
@@ -23,9 +22,29 @@ function App() {
       }
   }
 
+  const removeFromCart = (id) => {
+    const newCart = cart.filter((guitar) => guitar.id !== id)
+    setCart(newCart)
+  }
+
+  const incrementQuantity = (id) => {
+    const newCart = cart.map((guitar) => guitar.id === id ? {...guitar, quantity: guitar.quantity + 1} : guitar)
+    setCart(newCart)
+  }
+
+  const decrementQuantity = (id) => {
+    const newCart = cart.map((guitar) => guitar.id === id ? {...guitar, quantity: guitar.quantity - 1} : guitar)
+    setCart(newCart)
+  }
+
   return (
     <>
-      <Header />
+      <Header
+        cart={cart}
+        removeFromCart={removeFromCart}
+        incrementQuantity={incrementQuantity}
+        decrementQuantity={decrementQuantity}
+      />
 
 
       <main className="container-xl mt-5">
